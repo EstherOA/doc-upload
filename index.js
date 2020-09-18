@@ -2,7 +2,7 @@ require("dotenv").config();
 var express = require("express");
 var jwt = require("jsonwebtoken");
 var http = require("http");
-var { models, sequelize } = require("./models");
+var { sequelize } = require("./models");
 const { ApolloServer } = require("apollo-server-express");
 
 const typeDefs = require("./graphql/schema");
