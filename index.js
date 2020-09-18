@@ -28,6 +28,7 @@ const server = new ApolloServer({
 
     return { user };
   },
+  introspection: true,
 });
 
 server.applyMiddleware({ app });
