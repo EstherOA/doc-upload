@@ -17,7 +17,6 @@ const typeDefs = gql`
     lastName: String!
     email: String!
     password: String!
-    roleId: Int!
   }
 
   type AuthPayload {
@@ -26,6 +25,7 @@ const typeDefs = gql`
   }
 
   type Query {
+    getUser(id: Int!): User
     getDocument(id: Int!): Document
     getAllDocuments: [Document]
     getDocumentsByRegion(region: String!): [Document]
@@ -48,10 +48,16 @@ const typeDefs = gql`
       lastName: String!
       email: String!
       password: String!
-      roleId: Int!
     ): AuthPayload
     loginUser(email: String!, password: String!): AuthPayload
     forgotPassword(password: String!): User
+    updateUser(
+      id: Int!
+      firstName: String
+      lastName: String
+      email: String
+    ): User
+    removeUser(id: ID!): Boolean
   }
 `;
 

@@ -1,37 +1,31 @@
 const { Document } = require("../models").models;
 const { User } = require("../models").models;
 
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { AuthenticationError } = require("apollo-server-express");
-
-const verifyToken = (token) => {
-  try {
-    const { email } = jwt.verify(token, "supersecret");
-    return { email, token };
-  } catch (e) {
-    throw new AuthenticationError(
-      "Authentication token is invalid, please log in"
-    );
-  }
-};
+const { createToken, verifyToken, authoriseUser } = require("./auth");
 
 const resolvers = {
   Query: {
-    async getDocument(_, args) {
+    async getUser(_, args, context) {
+      const user = await User.findOne({ where: { id: args.id } });
+      return user;
+    },
+    async getDocument(_, args, context) {
       if (args.id) {
         return await Document.findOne({ where: { id: args.id } });
       }
       throw new Error("Document not found");
     },
-    async getAllDocuments(_, args) {
+    async getAllDocuments(_, args, context) {
       const docList = await Document.findAll();
       if (docList) {
         return docList;
       }
       throw new Error("Error while retrieving documents");
     },
-    async getDocumentsByRegion(_, args) {
+    async getDocumentsByRegion(_, args, context) {
+      if (!context) throw new Error("You must be logged in");
       const docList = await Document.findAll({
         where: {
           region: args.region,
@@ -42,7 +36,7 @@ const resolvers = {
       }
       throw new Error("Error while retrieving documents");
     },
-    async getDocumentsByDistrict(_, args) {
+    async getDocumentsByDistrict(_, args, context) {
       const docList = await Document.findAll({
         where: {
           district: args.district,
@@ -53,7 +47,7 @@ const resolvers = {
       }
       throw new Error("Error while retrieving documents");
     },
-    async getDocumentsByUserId(_, args) {
+    async getDocumentsByUserId(_, args, context) {
       const docList = await Document.findAll({
         where: {
           userId: args.userId,
@@ -66,13 +60,13 @@ const resolvers = {
     },
   },
   Mutation: {
-    async createDocument(_, args) {
+    async createDocument(_, args, context) {
       if (args) {
         return await Document.create(args);
       }
       throw new Error("Document creation failed");
     },
-    async removeDocument(_, args) {
+    async removeDocument(_, args, context) {
       return await Document.destroy({
         where: {
           id: args.id,
@@ -80,16 +74,23 @@ const resolvers = {
       });
     },
     async registerUser(_, args) {
-      const user = await User.create({
-        password: await bcrypt.hash(password, 10),
-        ...args,
+      const foundUser = await User.findOne({
+        where: {
+          email: args.email,
+        },
       });
 
-      return jwt.sign(
-        { email: user.email, id: user.id },
-        process.env.JWT_SECRET,
-        { expiresIn: "3m" }
-      );
+      if (foundUser) {
+        throw new Error("User already exists");
+      }
+      const { password, ...data } = args;
+      const user = await User.create({
+        password: await bcrypt.hash(args.password, 10),
+        ...data,
+      });
+
+      const token = createToken(user);
+      return { user, token };
     },
     async loginUser(_, { email, password }) {
       const user = await User.findOne({ where: { email: email } });
@@ -99,20 +100,37 @@ const resolvers = {
 
       const isUserValid = await bcrypt.compare(password, user.password);
 
-      if (!valid) {
+      if (!isUserValid) {
         throw new AuthenticationError("Authentication failed");
       }
+      const token = createToken(user);
 
-      const token = jwt.sign(
-        { email: email, id: user.id },
-        process.env.JWT_SECRET,
-        { expiresIn: "3m" }
-      );
       return { user, token };
     },
-    async forgotPassword(_, { password }) {},
-    async updateUser(_, args) {},
-    async deleteUser(_, args) {},
+    async forgotPassword(_, { password }, context) {},
+    async updateUser(_, args, context) {
+      const { id, ...data } = args;
+
+      if (data) {
+        User.update(data, {
+          where: {
+            id: id,
+          },
+        });
+        return await User.findOne({
+          where: {
+            id: id,
+          },
+        });
+      }
+    },
+    async removeUser(_, args, context) {
+      return await User.destroy({
+        where: {
+          id: args.id,
+        },
+      });
+    },
   },
 };
 

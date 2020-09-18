@@ -1,22 +1,24 @@
 require("dotenv").config();
 var express = require("express");
+var jwt = require("jsonwebtoken");
 var { models, sequelize } = require("./models");
 const { ApolloServer } = require("apollo-server-express");
 
 const typeDefs = require("./graphql/schema");
 const resolvers = require("./graphql/resolvers");
 var cors = require("cors");
+const { getUserFromToken } = require("./graphql/auth");
 
 var app = express();
 
 //cors and graphql
 app.use("*", cors());
 
-const auth = jwt({
-  secret: process.env.JWT_SECRET,
-  credentialsRequired: false,
-});
-app.use(auth);
+// const auth = jwt({
+//   secret: process.env.JWT_SECRET,
+//   credentialsRequired: false,
+// });
+// app.use(auth);
 
 const server = new ApolloServer({
   typeDefs,
@@ -26,7 +28,10 @@ const server = new ApolloServer({
   },
   context: ({ req }) => {
     const token = req.headers.authorization || "";
-    return { token };
+
+    const user = getUserFromToken(token);
+
+    return { user };
   },
 });
 
