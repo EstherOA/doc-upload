@@ -14,12 +14,6 @@ var app = express();
 //cors and graphql
 app.use("*", cors());
 
-// const auth = jwt({
-//   secret: process.env.JWT_SECRET,
-//   credentialsRequired: false,
-// });
-// app.use(auth);
-
 const server = new ApolloServer({
   typeDefs,
   resolvers,
