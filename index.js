@@ -32,14 +32,10 @@ const server = new ApolloServer({
 server.applyMiddleware({ app });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("The server started on port " + PORT);
+sequelize.sync().then(() => {
+  app.listen(PORT, () => {
+    console.log("The server started on port " + PORT);
+  });
 });
-
-// sequelize.sync().then(() => {
-//   app.listen(PORT, () => {
-//     console.log("The server started on port " + PORT);
-//   });
-// });
 
 module.exports = app;
