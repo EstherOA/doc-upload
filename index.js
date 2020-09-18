@@ -15,22 +15,22 @@ var app = express();
 //cors and graphql
 app.use("*", cors());
 
-const typeDefs = gql`
-  type Book {
-    title: String
-    author: String
-  }
+// const typeDefs = gql`
+//   type Book {
+//     title: String
+//     author: String
+//   }
 
-  type Query {
-    books: [Book]
-  }
-`;
+//   type Query {
+//     books: [Book]
+//   }
+// `;
 
-const resolvers = {
-  Query: {
-    books: () => ["books"],
-  },
-};
+// const resolvers = {
+//   Query: {
+//     books: () => ["books"],
+//   },
+// };
 
 const server = new ApolloServer({
   typeDefs,
