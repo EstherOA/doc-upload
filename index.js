@@ -1,6 +1,7 @@
 require("dotenv").config();
 var express = require("express");
 var jwt = require("jsonwebtoken");
+var http = require("http");
 var { models, sequelize } = require("./models");
 const { ApolloServer } = require("apollo-server-express");
 
@@ -31,11 +32,13 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
+const httpServer = http.createServer(app);
+
 const PORT = process.env.PORT || 3000;
 sequelize.sync().then(() => {
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log("The server started on port " + PORT);
   });
 });
 
-module.exports = app;
+module.exports = server;
