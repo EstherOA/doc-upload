@@ -5,8 +5,8 @@ var http = require("http");
 var { sequelize } = require("./models");
 const { ApolloServer, gql } = require("apollo-server-express");
 
-// const typeDefs = require("./graphql/schema");
-// const resolvers = require("./graphql/resolvers");
+const typeDefs = require("./graphql/schema");
+const resolvers = require("./graphql/resolvers");
 var cors = require("cors");
 const { getUserFromToken } = require("./graphql/auth");
 
