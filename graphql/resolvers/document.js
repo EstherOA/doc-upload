@@ -1,4 +1,4 @@
-const { Document } = require("../models").models;
+const { Document } = require("../../models").models;
 
 const documentResolver = {
   Query: {

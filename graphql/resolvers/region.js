@@ -1,4 +1,4 @@
-const { Region } = require("../models").models;
+const { Region } = require("../../models").models;
 
 const regionResolver = {
   Query: {

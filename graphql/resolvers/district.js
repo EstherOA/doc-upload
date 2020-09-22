@@ -1,4 +1,4 @@
-const { District } = require("../models").models;
+const { District } = require("../../models").models;
 
 const districtResolver = {
   Query: {

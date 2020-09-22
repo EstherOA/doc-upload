@@ -39,18 +39,16 @@ const schema = gql`
       fileType: String!
       userId: Int!
       districtId: String!
-      regionId: String!
       comments: String!
     ): Document
     updateDocument(
       id: Int!
-      name: String!
-      url: String!
-      fileType: String!
-      userId: Int!
-      districtId: String!
-      regionId: String!
-      comments: String!
+      name: String
+      url: String
+      fileType: String
+      userId: Int
+      districtId: String
+      comments: String
     ): Document
     removeDocument(id: ID!): Boolean
     registerUser(

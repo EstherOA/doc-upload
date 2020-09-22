@@ -28,7 +28,7 @@ const models = {
   User: user(sequelize, Sequelize),
   Document: document(sequelize, Sequelize),
   Region: region(sequelize, Sequelize),
-  district: region(sequelize, Sequelize),
+  District: region(sequelize, Sequelize),
 };
 
 Object.keys(models).forEach((key) => {
