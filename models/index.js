@@ -1,5 +1,6 @@
 var Sequelize = require("sequelize");
 var document = require("./document");
+const region = require("./region");
 var user = require("./user");
 
 const sequelize = new Sequelize(
@@ -18,15 +19,6 @@ const sequelize = new Sequelize(
   }
 );
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Connection has been established successfully.");
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
-  });
-
 const db = {};
 
 db.Sequelize = Sequelize;
@@ -35,6 +27,8 @@ db.sequelize = sequelize;
 const models = {
   User: user(sequelize, Sequelize),
   Document: document(sequelize, Sequelize),
+  Region: region(sequelize, Sequelize),
+  district: region(sequelize, Sequelize),
 };
 
 Object.keys(models).forEach((key) => {

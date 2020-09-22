@@ -23,24 +23,18 @@ const document = (sequelize, Sequelize) => {
         notEmpty: true,
       },
     },
-    district: {
+    comments: {
       type: Sequelize.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    region: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
+      allowNull: true,
     },
   });
 
   Document.associate = (models) => {
     Document.belongsTo(models.User);
+  };
+
+  Document.associate = (models) => {
+    Document.belongsTo(models.District);
   };
 
   // Document.findByRegion = async (region) => {
