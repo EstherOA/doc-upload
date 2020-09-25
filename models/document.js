@@ -27,6 +27,13 @@ const document = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: true,
     },
+    size: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
   });
 
   Document.associate = (models) => {

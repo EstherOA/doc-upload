@@ -9,6 +9,7 @@ const docSchema = gql`
     userId: Int!
     districtId: String!
     comments: String!
+    size: Float!
   }
 `;
 

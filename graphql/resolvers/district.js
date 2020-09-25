@@ -15,11 +15,30 @@ const districtResolver = {
       }
       throw new Error("Error while retrieving districts");
     },
-    //get all districts in a region
-    //get all users in a district
+    async getDistrictsByRegion(_, args, context) {
+      const districts = await District.findAll({
+        where: {
+          regionId: args.regionId,
+        },
+      });
+      if (districts) {
+        return districts;
+      }
+      throw new Error("Error while retrieving districts");
+    },
+    async getDistrictUsers(_, args, context) {
+      const district = await District.findOne({
+        where: {
+          id: args.id,
+        },
+      });
+      if (district) {
+        return district.getUserDistricts();
+      }
+      throw new Error("Error while retrieving district users");
+    },
   },
   Mutation: {
-    //set users in district
     async createDistrict(_, args, context) {
       if (args) {
         return await District.create(args);
@@ -47,6 +66,16 @@ const districtResolver = {
             id: id,
           },
         });
+      }
+    },
+    async addUser(_, args, context) {
+      const district = await District.findOne({
+        where: {
+          id: args.id,
+        },
+      });
+      if (district && !district.hasUserDistrict(args.userId)) {
+        district.addUserDistrict(args.userId);
       }
     },
   },

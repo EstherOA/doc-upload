@@ -40,6 +40,7 @@ const schema = gql`
       userId: Int!
       districtId: String!
       comments: String!
+      size: Float!
     ): Document
     updateDocument(
       id: Int!
@@ -48,6 +49,7 @@ const schema = gql`
       fileType: String
       userId: Int
       districtId: String
+      size: Float
       comments: String
     ): Document
     removeDocument(id: ID!): Boolean

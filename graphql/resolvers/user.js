@@ -10,6 +10,22 @@ const userResolver = {
       const user = await User.findOne({ where: { id: args.id } });
       return user;
     },
+    async getAllUsers(_, args, context) {
+      const userList = await User.findAll();
+      if (userList) {
+        return userList;
+      }
+      throw new Error("Error while retrieving users");
+    },
+    async getUserDistricts(_, args, context) {
+      const user = User.findOne({
+        where: {
+          id: args.id,
+        },
+      });
+      if (user) return user.getUserDistricts();
+      throw new Error("Error while retrieving user districts");
+    },
   },
   Mutation: {
     async registerUser(_, args) {
@@ -69,6 +85,9 @@ const userResolver = {
           id: args.id,
         },
       });
+    },
+    async setUserDistricts(_, args, context) {
+      return await User.setUserDistricts(args);
     },
   },
 };
