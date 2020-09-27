@@ -1,12 +1,15 @@
 const { District } = require("../../models").models;
 const { User } = require("../../models").models;
 const Joi = require("joi");
-const { isAuthenticatedUser } = require("../auth");
+const user = require("../../models/user");
+const { isAuthenticatedUser, isAuthorisedUser } = require("../auth");
+const Op = require("sequelize").Op;
 
 const districtResolver = {
   Query: {
     async getDistrict(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.id);
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -60,6 +63,7 @@ const districtResolver = {
     },
     async getDistrictUsers(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.id);
 
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
@@ -111,6 +115,7 @@ const districtResolver = {
     },
     async removeDistrict(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.id);
 
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
@@ -135,6 +140,7 @@ const districtResolver = {
     },
     async updateDistrict(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.id);
 
       const schema = Joi.object({
         name: Joi.string().min(2),
@@ -171,6 +177,7 @@ const districtResolver = {
     },
     async addUser(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.id);
 
       const schema = Joi.object({
         userId: Joi.string().alphanum().required(),
@@ -208,6 +215,7 @@ const districtResolver = {
     },
     async removeDistrictUser(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.id);
 
       const schema = Joi.object({
         userId: Joi.string().alphanum().required(),

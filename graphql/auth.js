@@ -1,5 +1,6 @@
 const { AuthenticationError } = require("apollo-server-express");
 const jwt = require("jsonwebtoken");
+const districtResolver = require("./resolvers/district");
 const { User } = require("../models").models;
 
 const getUserFromToken = async (token) => {
@@ -37,23 +38,35 @@ const createToken = ({ email, id }) => {
   });
 };
 
-const isAuthorisedUser = (user, districtId) => {
+const isAuthorisedUser = async (user, districtId) => {
   let authorised = false;
-  const districts = user.getDistricts();
+  const districts = await user.getDistricts();
   if (!districts) {
-    return authorised;
+    throw new Error("You are not authorised to perform this action");
   }
   districts.map((district) => {
-    if (district.id === districtId) {
+    if (district.id == districtId) {
       authorised = true;
     }
   });
-
-  return authorised;
+  if (!authorised)
+    throw new Error("You are not authorised to perform this action");
 };
 
 const isAuthenticatedUser = (user) => {
   if (!user) throw new AuthenticationError("You need to be signed in");
+};
+
+const getUserDistrictIds = async (user) => {
+  let districtList = [];
+  let districts = await user.getDistricts();
+  if (districts) {
+    districts.map((district) => {
+      districtList.push(district.id);
+    });
+  }
+
+  return districtList;
 };
 
 module.exports = {
@@ -62,4 +75,5 @@ module.exports = {
   createToken,
   isAuthorisedUser,
   isAuthenticatedUser,
+  getUserDistrictIds,
 };

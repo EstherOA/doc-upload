@@ -1,11 +1,18 @@
 const { Document } = require("../../models").models;
 const Joi = require("joi");
+const Op = require("sequelize").Op;
 const { District } = require("../../models").models;
+const {
+  isAuthenticatedUser,
+  isAuthorisedUser,
+  getUserDistrictIds,
+} = require("../auth");
 
 const documentResolver = {
   Query: {
     async getDocument(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.id);
 
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
@@ -114,6 +121,7 @@ const documentResolver = {
   Mutation: {
     async createDocument(_, args, context) {
       isAuthenticatedUser(context.user);
+      await isAuthorisedUser(context.user, args.districtId);
 
       const schema = Joi.object({
         name: Joi.string().min(2).required(),
@@ -153,11 +161,16 @@ const documentResolver = {
           throw new Error(error);
         }
 
-        return await Document.destroy({
+        const doc = await Document.findOne({
           where: {
             id: args.id,
+            districtId: {
+              [Op.or]: await getUserDistrictIds(context.user),
+            },
           },
         });
+        if (doc) return doc.destroy();
+        throw new Error("Document not found");
       } catch (e) {
         console.log("Error deleting document: ", e);
         throw new Error(e);
@@ -179,19 +192,33 @@ const documentResolver = {
 
       try {
         const { error } = schema.validate(args);
-
+        let result = false;
         if (error) {
           console.log(error);
           throw new Error(error);
         }
         const { id, ...data } = args;
+        const userDistrictList = await getUserDistrictIds(context.user);
 
-        const result = await Document.update(data, {
+        if (args.districtId && !userDistrictList.includes(args.districtId))
+          throw new Error(
+            "You do not have the permission to perform this action"
+          );
+
+        const doc = await Document.findOne({
           where: {
-            id: id,
+            id: args.id,
+            districtId: {
+              [Op.or]: userDistrictList,
+            },
           },
         });
-        if (!result) throw new Error();
+        console.log(doc);
+
+        if (doc) {
+          result = await doc.update(args);
+        }
+        if (!result) throw new Error("Document not found");
         return await Document.findOne({
           where: {
             id: id,

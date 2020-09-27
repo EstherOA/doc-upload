@@ -1,5 +1,6 @@
 const { Region } = require("../../models").models;
 const Joi = require("joi");
+const { isAuthenticatedUser } = require("../auth");
 
 const regionResolver = {
   Query: {

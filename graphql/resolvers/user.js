@@ -2,7 +2,7 @@ const { User } = require("../../models").models;
 const { District } = require("../../models").models;
 const bcrypt = require("bcrypt");
 const { AuthenticationError } = require("apollo-server-express");
-const { createToken } = require("../auth");
+const { createToken, isAuthenticatedUser } = require("../auth");
 
 const Op = require("sequelize").Op;
 
