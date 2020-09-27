@@ -1,10 +1,12 @@
 const { District } = require("../../models").models;
 const { User } = require("../../models").models;
 const Joi = require("joi");
+const { isAuthenticatedUser } = require("../auth");
 
 const districtResolver = {
   Query: {
     async getDistrict(_, args, context) {
+      isAuthenticatedUser(context.user);
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -24,6 +26,7 @@ const districtResolver = {
       }
     },
     async getAllDistricts(_, args, context) {
+      isAuthenticatedUser(context.user);
       try {
         return await District.findAll();
       } catch (e) {
@@ -32,6 +35,8 @@ const districtResolver = {
       }
     },
     async getDistrictsByRegion(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         regionId: Joi.string().alphanum().required(),
       });
@@ -54,6 +59,8 @@ const districtResolver = {
       }
     },
     async getDistrictUsers(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -82,6 +89,8 @@ const districtResolver = {
   },
   Mutation: {
     async createDistrict(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         name: Joi.string().min(2).required(),
         regionId: Joi.string().alphanum().required(),
@@ -101,6 +110,8 @@ const districtResolver = {
       }
     },
     async removeDistrict(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -123,6 +134,8 @@ const districtResolver = {
       }
     },
     async updateDistrict(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         name: Joi.string().min(2),
         regionId: Joi.string().alphanum(),
@@ -157,6 +170,8 @@ const districtResolver = {
       }
     },
     async addUser(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         userId: Joi.string().alphanum().required(),
         id: Joi.string().alphanum().required(),
@@ -192,6 +207,8 @@ const districtResolver = {
       }
     },
     async removeDistrictUser(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         userId: Joi.string().alphanum().required(),
         id: Joi.string().alphanum().required(),

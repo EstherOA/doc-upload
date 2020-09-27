@@ -4,6 +4,8 @@ const Joi = require("joi");
 const regionResolver = {
   Query: {
     async getRegion(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -21,6 +23,8 @@ const regionResolver = {
       }
     },
     async getAllRegions(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       try {
         return await Region.findAll();
       } catch (e) {
@@ -31,6 +35,8 @@ const regionResolver = {
   },
   Mutation: {
     async createRegion(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         name: Joi.string().min(3).required(),
       });
@@ -48,6 +54,8 @@ const regionResolver = {
       }
     },
     async removeRegion(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -69,6 +77,8 @@ const regionResolver = {
       }
     },
     async updateRegion(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         name: Joi.string().min(3).required(),
         id: Joi.string().alphanum().required(),

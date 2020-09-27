@@ -5,6 +5,8 @@ const { District } = require("../../models").models;
 const documentResolver = {
   Query: {
     async getDocument(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -24,6 +26,8 @@ const documentResolver = {
       }
     },
     async getAllDocuments(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       try {
         return await Document.findAll();
       } catch (e) {
@@ -32,6 +36,8 @@ const documentResolver = {
       }
     },
     async getDocumentsByRegion(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         regionId: Joi.string().alphanum().required(),
       });
@@ -57,6 +63,8 @@ const documentResolver = {
       }
     },
     async getDocumentsByDistrict(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         districtId: Joi.string().alphanum().required(),
       });
@@ -79,6 +87,8 @@ const documentResolver = {
       }
     },
     async getDocumentsByUserId(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         userId: Joi.string().alphanum().required(),
       });
@@ -103,6 +113,8 @@ const documentResolver = {
   },
   Mutation: {
     async createDocument(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         name: Joi.string().min(2).required(),
         url: Joi.string().min(3).required(),
@@ -127,6 +139,8 @@ const documentResolver = {
       }
     },
     async removeDocument(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -150,6 +164,8 @@ const documentResolver = {
       }
     },
     async updateDocument(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
         name: Joi.string().min(2),

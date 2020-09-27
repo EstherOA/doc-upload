@@ -39,14 +39,16 @@ const createToken = ({ email, id }) => {
 
 const isAuthorisedUser = (user, districtId) => {
   let authorised = false;
-  const districts = user.getUserDistricts();
-  if (districts && districts.length > 0) {
-    districts.map((district) => {
-      if (district.id === districtId) {
-        authorised = true;
-      }
-    });
+  const districts = user.getDistricts();
+  if (!districts) {
+    return authorised;
   }
+  districts.map((district) => {
+    if (district.id === districtId) {
+      authorised = true;
+    }
+  });
+
   return authorised;
 };
 

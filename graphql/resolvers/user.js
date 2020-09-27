@@ -11,6 +11,8 @@ const Joi = require("joi");
 const userResolver = {
   Query: {
     async getUser(_, { id }, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -29,6 +31,8 @@ const userResolver = {
       }
     },
     async getAllUsers(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       try {
         return await User.findAll();
       } catch (e) {
@@ -37,6 +41,8 @@ const userResolver = {
       }
     },
     async getUserDistricts(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -135,6 +141,8 @@ const userResolver = {
     },
     async forgotPassword(_, { password }, context) {},
     async updateUser(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
         firstName: Joi.string().min(2),
@@ -170,6 +178,8 @@ const userResolver = {
       }
     },
     async removeUser(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
       });
@@ -192,6 +202,8 @@ const userResolver = {
       }
     },
     async setUserDistricts(_, args, context) {
+      isAuthenticatedUser(context.user);
+
       const schema = Joi.object({
         id: Joi.string().alphanum().required(),
         districts: Joi.array().items(Joi.string().alphanum().required()),
