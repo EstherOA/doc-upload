@@ -1,7 +1,10 @@
 const { User } = require("../../models").models;
+const { District } = require("../../models").models;
 const bcrypt = require("bcrypt");
 const { AuthenticationError } = require("apollo-server-express");
 const { createToken } = require("../auth");
+
+const Op = require("sequelize").Op;
 
 const Joi = require("joi");
 
@@ -50,7 +53,10 @@ const userResolver = {
             id: args.id,
           },
         });
-        if (user) return user.getUserDistricts();
+        if (!user) {
+          throw new Error("User not found");
+        }
+        return user.getDistricts();
       } catch (e) {
         console.log("Error retrieving user districts: ", e);
         throw new Error(e);
@@ -203,10 +209,23 @@ const userResolver = {
             id: args.id,
           },
         });
-        if (user) {
-          const result = await user.setUserDistricts(args.districts);
-          console.log(result);
+        if (!user) {
+          throw new Error("User not found");
         }
+        const districtList = await District.findAll({
+          where: {
+            id: {
+              [Op.or]: args.districts,
+            },
+          },
+        });
+
+        if (!districtList || districtList.length < 1) {
+          throw new Error("Districts not found");
+        }
+
+        await user.setDistricts(districtList);
+        return true;
       } catch (e) {
         console.log("Error updating user distrcts: ", e);
         throw new Error(e);

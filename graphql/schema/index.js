@@ -19,6 +19,13 @@ const schema = gql`
     tokenExpiration: Int!
   }
 
+  type UserDistrict {
+    userId: ID!
+    districtId: ID!
+    createdAt: String!
+    updatedAt: String!
+  }
+
   type Query {
     getUser(id: ID!): User
     getAllUsers: [User]
@@ -78,8 +85,9 @@ const schema = gql`
     removeUser(id: ID!): Boolean
     removeRegion(id: ID!): Boolean
     removeDistrict(id: ID!): Boolean
-    setUserDistricts(id: ID!, districts: [ID!]!): User
-    addUser(id: ID!, userId: ID!): District
+    setUserDistricts(id: ID!, districts: [ID!]!): Boolean
+    addUser(id: ID!, userId: ID!): UserDistrict
+    removeDistrictUser(id: ID!, userId: ID!): Boolean
   }
 `;
 

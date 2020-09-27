@@ -1,4 +1,5 @@
 const { District } = require("../../models").models;
+const { User } = require("../../models").models;
 const Joi = require("joi");
 
 const districtResolver = {
@@ -54,7 +55,7 @@ const districtResolver = {
     },
     async getDistrictUsers(_, args, context) {
       const schema = Joi.object({
-        regionId: Joi.string().alphanum().required(),
+        id: Joi.string().alphanum().required(),
       });
 
       try {
@@ -70,8 +71,9 @@ const districtResolver = {
           },
         });
         if (district) {
-          return district.getUserDistricts();
+          return district.getUsers();
         }
+        throw new Error("District not found");
       } catch (e) {
         console.log("Error fetching users: ", e);
         throw new Error(e);
@@ -155,17 +157,65 @@ const districtResolver = {
       }
     },
     async addUser(_, args, context) {
-      const district = await District.findOne({
-        where: {
-          id: args.id,
-        },
+      const schema = Joi.object({
+        userId: Joi.string().alphanum().required(),
+        id: Joi.string().alphanum().required(),
       });
-      if (district && !district.hasUser(args.userId)) {
-        const result = district.addUser(args.userId);
-        console.log(result);
-        return district;
+
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error("Invalid data");
+        }
+        let district = await District.findOne({
+          where: {
+            id: args.id,
+          },
+        });
+        if (!district) {
+          throw new Error("District not found");
+        }
+        const user = await User.findOne({
+          where: {
+            id: args.userId,
+          },
+        });
+        if (await district.hasUser(user)) {
+          throw new Error(`District already has user: ${args.userId}`);
+        }
+        return await district.addUser(args.userId);
+      } catch (e) {
+        console.log("Error adding user to district: ", e);
+        throw new Error(e);
       }
-      throw new Error("Error adding user to district");
+    },
+    async removeDistrictUser(_, args, context) {
+      const schema = Joi.object({
+        userId: Joi.string().alphanum().required(),
+        id: Joi.string().alphanum().required(),
+      });
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error("Invalid data");
+        }
+        let district = await District.findOne({
+          where: {
+            id: args.id,
+          },
+        });
+        if (!district) {
+          throw new Error("District not found");
+        }
+        return await district.removeUser(args.userId);
+      } catch (e) {
+        console.log("Error removing user from district: ", e);
+        throw new Error(e);
+      }
     },
   },
 };
