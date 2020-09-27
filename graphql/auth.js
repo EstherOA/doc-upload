@@ -19,25 +19,45 @@ const getUserFromToken = async (token) => {
 };
 
 const verifyToken = async (token) => {
-  if (!token || token.length < 1) {
+  try {
+    if (!token || token.length < 1) {
+      return null;
+    }
+    const { id } = jwt.verify(token, process.env.JWT_SECRET);
+    return id;
+  } catch (e) {
+    console.log("Error verifying token");
     return null;
   }
-  const { id } = jwt.verify(token, process.env.JWT_SECRET);
-  return id;
 };
 
 const createToken = ({ email, id }) => {
   return jwt.sign({ email: email, id: id }, process.env.JWT_SECRET, {
-    expiresIn: "3m",
+    expiresIn: "10m",
   });
 };
 
-const authoriseUser = (user, role) => {
-  if (!user || !user.roles.includes(role)) {
-    throw new AuthenticationError(
-      "You do not have permission to access this resource"
-    );
+const isAuthorisedUser = (user, districtId) => {
+  let authorised = false;
+  const districts = user.getUserDistricts();
+  if (districts && districts.length > 0) {
+    districts.map((district) => {
+      if (district.id === districtId) {
+        authorised = true;
+      }
+    });
   }
+  return authorised;
 };
 
-module.exports = { getUserFromToken, verifyToken, createToken, authoriseUser };
+const isAuthenticatedUser = (user) => {
+  if (!user) throw new AuthenticationError("You need to be signed in");
+};
+
+module.exports = {
+  getUserFromToken,
+  verifyToken,
+  createToken,
+  isAuthorisedUser,
+  isAuthenticatedUser,
+};

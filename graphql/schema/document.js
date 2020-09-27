@@ -2,14 +2,17 @@ const { gql } = require("apollo-server-express");
 
 const docSchema = gql`
   type Document {
-    id: Int!
+    id: ID!
     name: String!
     url: String!
     fileType: String!
-    userId: Int!
-    districtId: String!
+    userId: ID!
+    districtId: ID!
     comments: String!
     size: Float!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
   }
 `;
 

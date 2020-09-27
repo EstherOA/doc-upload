@@ -2,9 +2,12 @@ const { gql } = require("apollo-server-express");
 
 const districtSchema = gql`
   type District {
-    id: Int!
+    id: ID!
     name: String!
-    regionId: Int!
+    regionId: ID!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
   }
 `;
 

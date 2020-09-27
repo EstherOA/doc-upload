@@ -2,8 +2,11 @@ const { gql } = require("apollo-server-express");
 
 const regionSchema = gql`
   type Region {
-    id: Int!
+    id: ID!
     name: String!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
   }
 `;
 

@@ -16,20 +16,24 @@ const schema = gql`
   type AuthPayload {
     user: User!
     token: String!
+    tokenExpiration: Int!
   }
 
   type Query {
-    getUser(id: Int!): User
+    getUser(id: ID!): User
     getAllUsers: [User]
-    getDocument(id: Int!): Document
+    getDocument(id: ID!): Document
     getAllDocuments: [Document]
-    getDocumentsByRegion(regionId: Int!): [Document]
-    getDocumentsByDistrict(districtId: Int!): [Document]
-    getDocumentsByUserId(userId: Int!): [Document]
-    getRegion(id: Int!): Region
+    getDocumentsByRegion(regionId: ID!): [Document]
+    getDocumentsByDistrict(districtId: ID!): [Document]
+    getDocumentsByUserId(userId: ID!): [Document]
+    getRegion(id: ID!): Region
     getAllRegions: [Region]
-    getDistrict(id: Int!): District
+    getDistrict(id: ID!): District
     getAllDistricts: [District]
+    getUserDistricts(id: ID!): [District]
+    getDistrictsByRegion(regionId: ID!): [District]
+    getDistrictUsers(id: ID!): [User]
   }
 
   type Mutation {
@@ -37,18 +41,18 @@ const schema = gql`
       name: String!
       url: String!
       fileType: String!
-      userId: Int!
-      districtId: String!
-      comments: String!
+      userId: ID!
+      districtId: ID!
+      comments: String
       size: Float!
     ): Document
     updateDocument(
-      id: Int!
+      id: ID!
       name: String
       url: String
       fileType: String
-      userId: Int
-      districtId: String
+      userId: ID
+      districtId: ID
       size: Float
       comments: String
     ): Document
@@ -62,18 +66,20 @@ const schema = gql`
     loginUser(email: String!, password: String!): AuthPayload
     forgotPassword(password: String!): User
     updateUser(
-      id: Int!
+      id: ID!
       firstName: String
       lastName: String
       email: String
     ): User
     createRegion(name: String!): Region
-    updateRegion(id: Int!, name: String!): Region
-    createDistrict(name: String!, regionId: Int!): District
-    updateDistrict(id: Int!, name: String, regionId: Int): District
+    updateRegion(id: ID!, name: String!): Region
+    createDistrict(name: String!, regionId: ID!): District
+    updateDistrict(id: ID!, name: String, regionId: ID): District
     removeUser(id: ID!): Boolean
     removeRegion(id: ID!): Boolean
     removeDistrict(id: ID!): Boolean
+    setUserDistricts(id: ID!, districts: [ID!]!): User
+    addUser(id: ID!, userId: ID!): District
   }
 `;
 

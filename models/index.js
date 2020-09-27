@@ -1,4 +1,6 @@
+const { Model } = require("sequelize");
 var Sequelize = require("sequelize");
+const district = require("./district");
 var document = require("./document");
 const region = require("./region");
 var user = require("./user");
@@ -25,17 +27,26 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 const models = {
-  User: user(sequelize, Sequelize),
-  Document: document(sequelize, Sequelize),
   Region: region(sequelize, Sequelize),
-  District: region(sequelize, Sequelize),
+  User: user(sequelize, Sequelize),
+  District: district(sequelize, Sequelize),
+  Document: document(sequelize, Sequelize),
 };
 
-Object.keys(models).forEach((key) => {
-  if ("associate" in models[key]) {
-    models[key].associate(models);
-  }
-});
+// Object.keys(models).forEach((key) => {
+//   if ("associate" in models[key]) {
+//     models[key].associate(models);
+//   }
+// });
+
+models.Region.hasMany(models.District);
+models.User.hasMany(models.Document);
+models.User.belongsToMany(models.District, { through: "userDistricts" });
+models.District.hasMany(models.Document);
+models.District.belongsTo(models.Region);
+models.District.belongsToMany(models.User, { through: "userDistricts" });
+models.Document.belongsTo(models.User);
+models.Document.belongsTo(models.District);
 
 db.models = models;
 

@@ -1,83 +1,189 @@
 const { Document } = require("../../models").models;
+const Joi = require("joi");
+const { District } = require("../../models").models;
 
 const documentResolver = {
   Query: {
     async getDocument(_, args, context) {
-      if (args.id) {
+      const schema = Joi.object({
+        id: Joi.string().alphanum().required(),
+      });
+
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
+
         return await Document.findOne({ where: { id: args.id } });
+      } catch (e) {
+        console.log("Error fetching document: ", e);
+        throw new Error(e);
       }
-      throw new Error("Document not found");
     },
     async getAllDocuments(_, args, context) {
-      const docList = await Document.findAll();
-      if (docList) {
-        return docList;
+      try {
+        return await Document.findAll();
+      } catch (e) {
+        console.log("Error fetching documents: ", e);
+        throw new Error(e);
       }
-      throw new Error("Error while retrieving documents");
     },
     async getDocumentsByRegion(_, args, context) {
-      if (!context) throw new Error("You must be logged in");
-      const docList = await Document.findAll({
-        where: {
-          regionId: args.regionId,
-        },
+      const schema = Joi.object({
+        regionId: Joi.string().alphanum().required(),
       });
-      if (docList) {
-        return docList;
+
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
+        return await Document.findAll({
+          include: [
+            {
+              model: District,
+              where: { regionId: args.regionId },
+            },
+          ],
+        });
+      } catch (e) {
+        console.log("Error fetching documents: ", e);
+        throw new Error(e);
       }
-      throw new Error("Error while retrieving documents");
     },
     async getDocumentsByDistrict(_, args, context) {
-      const docList = await Document.findAll({
-        where: {
-          districtId: args.districtId,
-        },
+      const schema = Joi.object({
+        districtId: Joi.string().alphanum().required(),
       });
-      if (docList) {
-        return docList;
+
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
+        return await Document.findAll({
+          where: {
+            districtId: args.districtId,
+          },
+        });
+      } catch (e) {
+        console.log("Error fetching document: ", e);
+        throw new Error(e);
       }
-      throw new Error("Error while retrieving documents");
     },
     async getDocumentsByUserId(_, args, context) {
-      const docList = await Document.findAll({
-        where: {
-          userId: args.userId,
-        },
+      const schema = Joi.object({
+        userId: Joi.string().alphanum().required(),
       });
-      if (docList) {
-        return docList;
+
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
+        return await Document.findAll({
+          where: {
+            userId: args.userId,
+          },
+        });
+      } catch (e) {
+        console.log("Error fetching document: ", e);
+        throw new Error(e);
       }
-      throw new Error("Error while retrieving documents");
     },
   },
   Mutation: {
     async createDocument(_, args, context) {
-      if (args) {
+      const schema = Joi.object({
+        name: Joi.string().min(2).required(),
+        url: Joi.string().min(3).required(),
+        fileType: Joi.string().min(2).required(),
+        size: Joi.number().required().max(500000),
+        comments: Joi.string().min(3).max(100),
+        districtId: Joi.string().alphanum().required(),
+        userId: Joi.string().alphanum().required(),
+      });
+
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
         return await Document.create(args);
+      } catch (e) {
+        console.log("Error creating document: ", e);
+        throw new Error(e);
       }
-      throw new Error("Document creation failed");
     },
     async removeDocument(_, args, context) {
-      return await Document.destroy({
-        where: {
-          id: args.id,
-        },
+      const schema = Joi.object({
+        id: Joi.string().alphanum().required(),
       });
+
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
+
+        return await Document.destroy({
+          where: {
+            id: args.id,
+          },
+        });
+      } catch (e) {
+        console.log("Error deleting document: ", e);
+        throw new Error(e);
+      }
     },
     async updateDocument(_, args, context) {
-      const { id, ...data } = args;
+      const schema = Joi.object({
+        id: Joi.string().alphanum().required(),
+        name: Joi.string().min(2),
+        url: Joi.string().min(3),
+        fileType: Joi.string().min(2),
+        size: Joi.number().max(500000),
+        comments: Joi.string().min(3).max(100),
+        districtId: Joi.string().alphanum(),
+        userId: Joi.string().alphanum(),
+      });
 
-      if (data) {
-        Document.update(data, {
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
+        const { id, ...data } = args;
+
+        const result = await Document.update(data, {
           where: {
             id: id,
           },
         });
+        if (!result) throw new Error();
         return await Document.findOne({
           where: {
             id: id,
           },
         });
+      } catch (e) {
+        console.log("Error updating document: ", e);
+        throw new Error(e);
       }
     },
   },

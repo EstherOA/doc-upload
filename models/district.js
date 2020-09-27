@@ -16,7 +16,11 @@ const district = (sequelize, Sequelize) => {
   };
 
   District.associate = (models) => {
-    District.belongsToMany(models.User, { through: "UserDistrict" });
+    District.belongsToMany(models.User, { through: "userDistricts" });
+  };
+
+  District.associate = (models) => {
+    District.hasMany(models.Document);
   };
 
   return District;

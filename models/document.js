@@ -1,5 +1,7 @@
 "use strict";
 
+const { models } = require(".");
+
 const document = (sequelize, Sequelize) => {
   const Document = sequelize.define("document", {
     name: {
@@ -37,39 +39,12 @@ const document = (sequelize, Sequelize) => {
   });
 
   Document.associate = (models) => {
-    Document.belongsTo(models.User);
-  };
-
-  Document.associate = (models) => {
     Document.belongsTo(models.District);
   };
 
-  // Document.findByRegion = async (region) => {
-  //   let documentList = await Document.findAll({
-  //     where: {
-  //       region: region,
-  //     },
-  //   });
-  //   return documentList;
-  // };
-
-  // Document.findByDistrict = async (district) => {
-  //   let documentList = await Document.findAll({
-  //     where: {
-  //       district: district,
-  //     },
-  //   });
-  //   return documentList;
-  // };
-
-  // Document.findByUserId = async (userId) => {
-  //   let documentList = await Document.findAll({
-  //     where: {
-  //       userId: userId,
-  //     },
-  //   });
-  //   return documentList;
-  // };
+  Document.associate = (models) => {
+    Document.belongsTo(models.User);
+  };
 
   return Document;
 };

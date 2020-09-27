@@ -38,7 +38,7 @@ const user = (sequelize, Sequelize) => {
   };
 
   User.associate = (models) => {
-    User.belongsToMany(models.District, { through: "UserDistrict" });
+    User.belongsToMany(models.District, { through: "userDistricts" });
   };
 
   return User;

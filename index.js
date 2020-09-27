@@ -1,8 +1,10 @@
 require("dotenv").config();
 var express = require("express");
 var http = require("http");
+var bodyParser = require("body-parser");
 var { sequelize } = require("./models");
-const { ApolloServer, gql } = require("apollo-server-express");
+const router = express.Router();
+const { ApolloServer } = require("apollo-server-express");
 
 const typeDefs = require("./graphql/schema");
 const resolvers = require("./graphql/resolvers");
@@ -13,6 +15,16 @@ var app = express();
 
 //cors and graphql
 app.use("*", cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+router.get("/", (req, res, next) => {
+  res.json({
+    status: "success",
+    data: "Hello Omnistan Upload",
+  });
+});
+app.use("/", router);
 
 const server = new ApolloServer({
   typeDefs,
@@ -20,10 +32,10 @@ const server = new ApolloServer({
   playground: {
     endpoint: "/graphql",
   },
-  context: ({ req }) => {
-    const token = req.headers.authorization || "";
+  context: async ({ req }) => {
+    const authorisation = req.headers.authorization || "";
 
-    const user = getUserFromToken(token);
+    const user = await getUserFromToken(authorisation.split(" ")[1]);
 
     return { user };
   },
