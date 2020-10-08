@@ -1,14 +1,22 @@
 const { Region } = require("../../models").models;
 const Joi = require("joi");
-const { isAuthenticatedUser } = require("../auth");
+const { isAuthenticatedUser } = require("../utils");
 
+const getAllRegions = async () => {
+  return await Region.findAll();
+};
+
+const getRegion = async (id) => {
+  let region = await Region.findOne({ where: { id: id } });
+  if (!region) throw new Error("Region not found");
+  return [region];
+};
 const regionResolver = {
   Query: {
-    async getRegion(_, args, context) {
+    async regions(_, args, context) {
       isAuthenticatedUser(context.user);
-
       const schema = Joi.object({
-        id: Joi.string().alphanum().required(),
+        id: Joi.string().alphanum(),
       });
 
       try {
@@ -17,17 +25,10 @@ const regionResolver = {
         if (error) {
           throw new Error("Invalid data");
         }
-        return await Region.findOne({ where: { id: args.id } });
-      } catch (e) {
-        console.log("Error retrieving region: ", e);
-        throw new Error(e);
-      }
-    },
-    async getAllRegions(_, args, context) {
-      isAuthenticatedUser(context.user);
 
-      try {
-        return await Region.findAll();
+        if (args.id) {
+          return await getRegion(args.id);
+        } else return await getAllRegions();
       } catch (e) {
         console.log("Error retrieving regions", e);
         throw new Error(e);

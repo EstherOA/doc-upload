@@ -27,19 +27,11 @@ const schema = gql`
   }
 
   type Query {
-    getUser(id: ID!): User
-    getAllUsers: [User]
-    getDocument(id: ID!): Document
-    getAllDocuments: [Document]
-    getDocumentsByRegion(regionId: ID!): [Document]
-    getDocumentsByDistrict(districtId: ID!): [Document]
-    getDocumentsByUserId(userId: ID!): [Document]
-    getRegion(id: ID!): Region
-    getAllRegions: [Region]
-    getDistrict(id: ID!): District
-    getAllDistricts: [District]
+    users(id: ID): [User!]!
+    documents(id: ID, regionId: ID, userId: ID, districtId: ID): [Document!]!
+    regions(id: ID): [Region!]!
+    districts(id: ID, regionId: ID): [District!]!
     getUserDistricts(id: ID!): [District]
-    getDistrictsByRegion(regionId: ID!): [District]
     getDistrictUsers(id: ID!): [User]
   }
 

@@ -12,7 +12,10 @@ const region = (sequelize, Sequelize) => {
   });
 
   Region.associate = (models) => {
-    Region.hasMany(models.District);
+    Region.hasMany(models.District, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
   };
 
   return Region;

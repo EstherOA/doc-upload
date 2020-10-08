@@ -2,39 +2,40 @@ const { User } = require("../../models").models;
 const { District } = require("../../models").models;
 const bcrypt = require("bcrypt");
 const { AuthenticationError } = require("apollo-server-express");
-const { createToken, isAuthenticatedUser } = require("../auth");
+const { createToken, isAuthenticatedUser } = require("../utils");
 
 const Op = require("sequelize").Op;
 
 const Joi = require("joi");
 
+const getAllUsers = async () => {
+  return await User.findAll();
+};
+
+const getUser = async (id) => {
+  const user = await User.findOne({ where: { id: id } });
+  if (!user) throw new Error(e);
+  return [user];
+};
+
 const userResolver = {
   Query: {
-    async getUser(_, { id }, context) {
+    async users(_, args, context) {
       isAuthenticatedUser(context.user);
 
       const schema = Joi.object({
-        id: Joi.string().alphanum().required(),
+        id: Joi.string().alphanum(),
       });
 
       try {
-        const { error } = schema.validate({ id });
+        const { error } = schema.validate(args);
 
         if (error) {
           throw new Error("Invalid data");
         }
-        const user = await User.findOne({ where: { id: id } });
-        return user;
-      } catch (e) {
-        console.log("Error retrieving user: ", e);
-        throw new Error(e);
-      }
-    },
-    async getAllUsers(_, args, context) {
-      isAuthenticatedUser(context.user);
 
-      try {
-        return await User.findAll();
+        if (args.id) return await getUser(args.id);
+        else return await getAllUsers();
       } catch (e) {
         console.log("Error retrieving users: ", e);
         throw new Error(e);

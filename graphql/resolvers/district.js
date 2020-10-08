@@ -2,65 +2,29 @@ const { District } = require("../../models").models;
 const { User } = require("../../models").models;
 const Joi = require("joi");
 const user = require("../../models/user");
-const { isAuthenticatedUser, isAuthorisedUser } = require("../auth");
+const { isAuthenticatedUser, isAuthorisedUser } = require("../utils");
 const Op = require("sequelize").Op;
+
+const getDistrict = async (id) => {
+  const district = await District.findOne({ where: { id: id } });
+  if (!district) throw new Error("District not found");
+  return [district];
+};
+
+const getAllDistricts = async () => {
+  return await District.findAll();
+};
+
+const getDistrictsByRegion = async (regionId) => {
+  return await District.findAll({
+    where: {
+      regionId: regionId,
+    },
+  });
+};
 
 const districtResolver = {
   Query: {
-    async getDistrict(_, args, context) {
-      isAuthenticatedUser(context.user);
-      await isAuthorisedUser(context.user, args.id);
-      const schema = Joi.object({
-        id: Joi.string().alphanum().required(),
-      });
-
-      try {
-        const { error } = schema.validate(args);
-
-        if (error) {
-          console.log(error);
-          throw new Error("Invalid data");
-        }
-
-        return await District.findOne({ where: { id: args.id } });
-      } catch (e) {
-        console.log("Error fetching district: ", e);
-        throw new Error(e);
-      }
-    },
-    async getAllDistricts(_, args, context) {
-      isAuthenticatedUser(context.user);
-      try {
-        return await District.findAll();
-      } catch (e) {
-        console.log("Error while retrieving districts: ", e);
-        throw new Error(e);
-      }
-    },
-    async getDistrictsByRegion(_, args, context) {
-      isAuthenticatedUser(context.user);
-
-      const schema = Joi.object({
-        regionId: Joi.string().alphanum().required(),
-      });
-
-      try {
-        const { error } = schema.validate(args);
-
-        if (error) {
-          console.log(error);
-          throw new Error("Invalid data");
-        }
-        return await District.findAll({
-          where: {
-            regionId: args.regionId,
-          },
-        });
-      } catch (e) {
-        console.log("Error fetching districts: ", e);
-        throw new Error(e);
-      }
-    },
     async getDistrictUsers(_, args, context) {
       isAuthenticatedUser(context.user);
       await isAuthorisedUser(context.user, args.id);
@@ -87,6 +51,32 @@ const districtResolver = {
         throw new Error("District not found");
       } catch (e) {
         console.log("Error fetching users: ", e);
+        throw new Error(e);
+      }
+    },
+    async districts(_, args, context) {
+      isAuthenticatedUser(context.user);
+      const schema = Joi.object({
+        id: Joi.string().alphanum(),
+        regionId: Joi.string().alphanum(),
+      }).nand("id", "regionId");
+      try {
+        const { error } = schema.validate(args);
+
+        if (error) {
+          console.log(error);
+          throw new Error("Invalid data: ", error);
+        }
+        if (args.id) {
+          await isAuthorisedUser(context.user, args.id);
+          return await getDistrict(args.id);
+        } else if (args.regionId) {
+          return await getDistrictsByRegion(args.regionId);
+        } else {
+          return await getAllDistricts();
+        }
+      } catch (e) {
+        console.log("Error fetching districts: ", e);
         throw new Error(e);
       }
     },

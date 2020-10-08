@@ -9,7 +9,13 @@ const { ApolloServer } = require("apollo-server-express");
 const typeDefs = require("./graphql/schema");
 const resolvers = require("./graphql/resolvers");
 var cors = require("cors");
-const { getUserFromToken } = require("./graphql/auth");
+const {
+  getUserFromToken,
+  saveDocumentToS3,
+  getDocumentFromS3,
+  listDocumentsFromS3,
+  deleteDocumentFromS3,
+} = require("./graphql/utils");
 
 var app = express();
 
@@ -25,6 +31,8 @@ router.get("/", (req, res, next) => {
   });
 });
 app.use("/", router);
+
+// deleteDocumentFromS3("Volta/Ada East/tenancy_ratio.png");
 
 const server = new ApolloServer({
   typeDefs,
