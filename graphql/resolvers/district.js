@@ -167,7 +167,6 @@ const districtResolver = {
     },
     async addUser(_, args, context) {
       isAuthenticatedUser(context.user);
-      await isAuthorisedUser(context.user, args.id);
 
       const schema = Joi.object({
         userId: Joi.string().alphanum().required(),

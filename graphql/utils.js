@@ -5,6 +5,7 @@ const { User } = require("../models").models;
 var path = require("path");
 var fs = require("fs");
 const AWS = require("aws-sdk");
+const { rejects } = require("assert");
 
 const getUserFromToken = async (token) => {
   const id = await verifyToken(token);
@@ -72,29 +73,34 @@ const getUserDistrictIds = async (user) => {
   return districtList;
 };
 
-const saveDocumentToS3 = (region, district, key) => {
+const saveDocumentToS3 = (dataUrl, region, district, key) => {
   let s3 = new AWS.S3();
   var uploadParams = { Bucket: "chaos-luspa-data", Key: "", Body: "" };
-  var file = "/home/nana/Downloads/tenancy_ratio.png";
+  // var file = "/home/nana/Downloads/tenancy_ratio.png";
 
   // Configure the file stream and obtain the upload parameters
-  var fileStream = fs.createReadStream(file);
-  fileStream.on("error", function (err) {
-    console.log("File Error", err);
-  });
-  uploadParams.Body = fileStream;
-  uploadParams.Key = region + "/" + district + "/" + path.basename(file);
+  // var fileStream = fs.createReadStream(file);
+  // fileStream.on("error", function (err) {
+  //   console.log("File Error", err);
+  // });
+
+  var data = dataUrl.split(",")[1];
+  var buf = Buffer.from(data).toString("base64");
+  uploadParams.Body = buf;
+  uploadParams.Key = region + "/" + district + "/" + key;
 
   // call S3 to retrieve upload file to specified bucket
-  s3.upload(uploadParams, function (err, data) {
-    if (err) {
-      console.log("Error", err);
-      throw new Error(err);
-    }
-    if (data) {
-      console.log("Upload Success", data.Location);
-      return data;
-    }
+  return new Promise((resolve, reject) => {
+    s3.upload(uploadParams, function (err, data) {
+      if (err) {
+        console.log("Error", err);
+        return reject(err);
+      }
+      if (data) {
+        console.log("Upload Success", data.Location);
+        return resolve(data);
+      }
+    });
   });
 };
 

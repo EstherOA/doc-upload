@@ -87,8 +87,7 @@ const documentResolver = {
       await isAuthorisedUser(context.user, args.districtId);
 
       const schema = Joi.object({
-        name: Joi.string().min(2).required(),
-        url: Joi.string().min(3).required(),
+        dataUrl: Joi.string().min().min(2).required(),
         fileType: Joi.string().min(2).required(),
         size: Joi.number().required().max(500000),
         comments: Joi.string().min(3).max(100),
@@ -107,12 +106,20 @@ const documentResolver = {
           where: { id: args.districtId },
         });
         if (!district) throw new Error("District does not exist");
-        const data = saveDocumentToS3(
-          district.getRegion().name,
+        const fileName = uuidv4() + "." + args.fileType;
+        const region = await district.getRegion();
+        const data = await saveDocumentToS3(
+          args.dataUrl,
+          region.name,
           district.name,
-          uuidv4()
+          fileName
         );
-        return await Document.create({ url: data.Location, ...args });
+        const { url, dataUrl, name, ...rest } = args;
+        return await Document.create({
+          url: data.Location,
+          name: fileName,
+          ...rest,
+        });
       } catch (e) {
         console.log("Error creating document: ", e);
         throw new Error(e);

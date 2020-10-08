@@ -37,8 +37,7 @@ const schema = gql`
 
   type Mutation {
     createDocument(
-      name: String!
-      url: String!
+      dataUrl: String!
       fileType: String!
       userId: ID!
       districtId: ID!
@@ -78,7 +77,7 @@ const schema = gql`
     removeRegion(id: ID!): Boolean
     removeDistrict(id: ID!): Boolean
     setUserDistricts(id: ID!, districts: [ID!]!): Boolean
-    addUser(id: ID!, userId: ID!): UserDistrict
+    addUser(id: ID!, userId: ID!): [UserDistrict]
     removeDistrictUser(id: ID!, userId: ID!): Boolean
   }
 `;
