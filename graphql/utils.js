@@ -74,7 +74,10 @@ const getUserDistrictIds = async (user) => {
 };
 
 const saveDocumentToS3 = (dataUrl, region, district, key) => {
-  let s3 = new AWS.S3();
+  let s3 = new AWS.S3({
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+  });
   var uploadParams = { Bucket: "chaos-luspa-data", Key: "", Body: "" };
   // var file = "/home/nana/Downloads/tenancy_ratio.png";
 
@@ -105,7 +108,10 @@ const saveDocumentToS3 = (dataUrl, region, district, key) => {
 };
 
 const listDocumentsFromS3 = (region, district) => {
-  s3 = new AWS.S3();
+  s3 = new AWS.S3({
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+  });
 
   // Create the parameters for calling listObjects
   var bucketParams = {
@@ -125,7 +131,10 @@ const listDocumentsFromS3 = (region, district) => {
 };
 
 const getDocumentFromS3 = (key) => {
-  let s3 = new AWS.S3();
+  let s3 = new AWS.S3({
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+  });
 
   var fileParams = {
     Bucket: "chaos-luspa-data",
@@ -145,7 +154,10 @@ const getDocumentFromS3 = (key) => {
 const updateS3Document = (region, district, key, data) => {};
 
 const deleteDocumentFromS3 = (key) => {
-  let s3 = new AWS.S3();
+  let s3 = new AWS.S3({
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+  });
 
   var fileParams = {
     Bucket: "chaos-luspa-data",
